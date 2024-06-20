@@ -3,7 +3,7 @@ project('wxHexEditor', 'cpp',
   default_options : ['warning_level=3', 'cpp_std=c++14'])
 
 # Dependencies
-wxwidgets_dep = dependency('wxwidgets')
+wxwidgets_dep = dependency('wxwidgets', modules: ['base', 'core', 'aui', 'xml', 'net'])
 mhash_dep     = dependency('mhash')
 udis86_dep    = dependency('udis86')
 
