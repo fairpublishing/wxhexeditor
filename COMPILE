@@ -1,0 +1,92 @@
+You can compile wxHexEditor with Code::Blocks (C::B) easily.
+All you need to install C::B for your OS, required compilation toolset (gcc) and wxHexEditor library for compilation.
+
+But you can also build wxHexEditor from your shell.
+For compiling wxHexEditor, without C::B you have to build internal udis and mhash libraries. They are automatically compiled when you run make command.
+
+Please follow those directives under your OS to compile wxHexEditor.
+-----------------------------------------------------
+LINUX
+-----------------------------------------------------
+For Linux, make sure you have installed wxWidgets.
+Use this command for ubuntu like distros:
+
+   apt-get install libwxgtk<version>-dev
+
+or use your need to use this one for distros like OpenSuSE...
+
+  zypper in wxWidgets-devel
+
+Then extract the wxHexEditor:
+
+  tar xvf wxHexEditor-v<version>-src.tar.bz2
+  cd wxHexEditor
+  make
+
+you can also use OPTFLAGS and WXCONFIG flags if you have different wx-config name like
+  make WXCONFIG=wx-config CPPFLAGS="-fPIC" OPTFLAGS="-O3 -march-native -fopenmp"
+
+Than you could use this command for installing wxHexEditor to your computer.
+  make install
+
+-----------------------------------------------------
+WINDOWS
+-----------------------------------------------------
+For generating Windows executables, I use Linux to cross-compile a Windows executable via MinGW.
+If you have cygwin, than good luck to build this with make command. But you are better to use C::B.
+
+On Linux Cross-Compiling To WINDOWS
+-----------------------------------------------------
+If you have Linux installation and want to build Win32/Win64 build of wxHexEditor, follow this guide.
+This is how I compile.
+First, I compile the wxWidgets library with a cross compiler:
+
+tar xvf wxWidgets-<version>.tar.bz2
+cd wxWidgets
+mkdir release
+cd release
+../configure --enable-{monolithic,static,unicode} --disable-{debug,shared} --host=i686-w64-mingw32
+make
+
+Then I extract the wxHexEditor:
+
+tar xvf wxHexEditor-v<version>-src.tar.bz2
+cd wxHexEditor
+make win WXCONFIG=<wx-congif path> HOST=i686-w64-mingw32
+
+PS: If you face with " _rpl_malloc " error, you can use 
+
+ac_cv_func_malloc_0_nonnull=yes make win WXCONFIG=<wx-congif path> HOST=i686-w64-mingw32
+
+-----------------------------------------------------
+OS X
+-----------------------------------------------------
+You need to have Xcode Commandline Tools installed on your Mac.
+For OS X, you need to have wxWidgets.
+
+You can easily install it with Homebrew installation:
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+After you could install required dependencies with this command:
+brew install wxmac gettext autoconf automake
+
+Or you can compile wxWidgets with:
+tar xvf wxWidgets-<version>.tar.bz2
+cd wxWidgets
+mkdir release
+cd release
+../configure --with-osx_cocoa --with-macosx-version-min=10.7  --disable-shared  --disable-mediactrl --with-{zlib,expat,libpng,libtiff,jpeg}=builtin --with-opengl --enable-universal-binary=x86_64,i386 CXXFLAGS="-stdlib=libc++ -std=c++11" OBJCXXFLAGS="-stdlib=libc++ -std=c++11" LDFLAGS="-stdlib=libc++" --enable-{release,unicode,monolithic}
+
+You might have some compilation issues with wxWidgets 3.1 using OSX 10.13.
+
+Then extract the wxHexEditor and compile with:
+tar xvf wxHexEditor-v<version>-src.tar.bz2
+cd wxHexEditor
+make mac WXCONFIG=<wx-config path>
+
+Opps! I forgot to say that, you probably need to remove -lgomp and -fopenmp included lines at Makefile manually due clang doesn't support OpenMP yet.
+
+If everything is OK, your executable is available to execute under:
+./wxHexEditor.app/Contents/MacOS/wxHexEditor
+
+That's all.
