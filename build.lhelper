@@ -1,47 +1,6 @@
-# This is bash script sourced to get some environment variables to configure the
-# build toolchain.
-
-# Set the variables CC and CXX to point to the C and C++ compilers to use.
-# They may contains options by separating them by spaces and quoting the command.
 CC="${CC:-gcc}"
 CXX="${CXX:-g++}"
 
-# Optional C/C++ and linker flags. Do not include optimization or debug flags,
-# they are automatically added based on the variables BUILD_TYPE, CPU_TYPE and CPU_TARGET.
-# CFLAGS=
-# CXXFLAGS=
-# LDFLAGS=
-
-
-# CPU architecture type and specific CPU to target. These variables are mandatory.
-# Possible values for CPU_TARGET are:
-#
-# x86-64 core2 athlon opteron barcelona bobcat jaguar bulldozer piledriver steamroller excavator
-# zen x86-64-v2 nehalem westmere sandybridge x86-64-v3 haswell broadwell skylake cooperlake atom
-# x86-64-v4 skylakex
-#
-# You may use a generic CPU architecture for CPU_TARGET like:
-#
-# x86-64       Support MMX SSE SSE2 FXSR
-# x86-64-v2    Support SSE3 SSE4_1 SSE4_2 SSSE3
-# x86-64-v3    Support AVX AVX2
-# x86-64-v4    Support AVX512
-#
-# For more informations: https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
-#
-# If CPU_TYPE and CPU_TARGET are not given they will be chosen based on the system
-# currently used. You may give some specific value below to force a build for a specific
-# architecture.
-#
-# CPU_TYPE="x86-64"
-# CPU_TARGET="x86-64"
-
-# Debug can be used to build the libraries including debug information.
-# It omitted will defaut to a release build.
 BUILD_TYPE="Release"
 
-# List of libraries to be installed. Can contain options by quoting the a string with
-# the libray name and its option followed by spaces.
-# For example:
-# packages=("freetype2"  "sdl2 -opengl")
-packages=(mhash udis86 expat libpng16 "wxwidgets -expat -png")
+packages=("mhash" "udis86" "expat" "libpng16" "wxwidgets -expat -png")
