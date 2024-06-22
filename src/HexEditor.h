@@ -25,7 +25,7 @@
 #ifndef _wxHexEditor_h_
 #define _wxHexEditor_h_
 
-#include "../mhash/include/mhash.h"
+#include "mhash.h"
 
 #include <wx/ffile.h>
 #include <wx/clipbrd.h>
