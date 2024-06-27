@@ -25,7 +25,7 @@
 #include "HexDialogs.h"
 #include <wx/progdlg.h>
 #include <wx/filepicker.h>
-#include "../mhash/include/mhash.h"
+#include "mhash.h"
 
 #ifdef __SSE2__
 #include <emmintrin.h>

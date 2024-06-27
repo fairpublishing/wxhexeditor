@@ -1,0 +1,7 @@
+CC="${CC:-gcc}"
+CXX="${CXX:-g++}"
+
+BUILD_TYPE="Release"
+
+packages=("pcre2" "mhash" "udis86" "expat" "libpng16" "wxwidgets -expat -png -regex")
+
