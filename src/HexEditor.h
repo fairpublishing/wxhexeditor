@@ -25,6 +25,7 @@
 #ifndef _wxHexEditor_h_
 #define _wxHexEditor_h_
 
+typedef bool _Bool;
 #include "mhash.h"
 
 #include <wx/ffile.h>
