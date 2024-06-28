@@ -24,6 +24,10 @@ src_files = [
   'src/HexEditorFrame.cpp'
 ]
 
+if host_machine.system() == 'windows'
+  src_files += 'src/windrv.cpp'
+endif
+
 executable('wxHexEditor',
   sources : src_files,
   dependencies : [wxwidgets_dep, mhash_dep, udis86_dep, zlib_dep],
