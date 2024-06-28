@@ -22,6 +22,8 @@
 *               email : spamjunkeater@gmail.com                         *
 *************************************************************************/
 
+#include <stdint.h>
+
 #include "windrv.h"
 
 using namespace std;
