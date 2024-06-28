@@ -1312,16 +1312,16 @@ void FindDialog::OnFindAll( bool internal ) {
 //WARNING! THIS FUNCTION WILL CHANGE BFR and/or SEARCH strings if SEARCH_MATCHCASE not selected as an option!
 inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, int search_size, unsigned options, std::vector<int> *ret_ptr ) {
 #ifdef __SSE2__
-	static const int REG_SZ = sizeof(__m128i);
+	static const int M128_REG_SZ = sizeof(__m128i);
 
-	char internal_array[REG_SZ];
+	char internal_array[M128_REG_SZ];
 #endif
 
 	if( bfr_size < search_size )
 		return -1;
 
 #ifdef __SSE2__
-	if(bfr_size < REG_SZ) {
+	if(bfr_size < M128_REG_SZ) {
 		memset(&internal_array[0], 0, sizeof(internal_array));
 		memcpy(&internal_array[0], bfr, bfr_size);
 		bfr = &internal_array[0];
@@ -1423,7 +1423,7 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 		const __m128i b = _mm_set1_epi8(FirstChL);
 		const __m128i c = _mm_set1_epi8(FirstChU);
 		if((options & SEARCH_FINDALL) || !( options & SEARCH_BACKWARDS)) { //Normal Operation
-			for(int i = 0; i <= bfr_size - std::max(search_size, REG_SZ) ; i += REG_SZ) {
+			for(int i = 0; i <= bfr_size - std::max(search_size, M128_REG_SZ) ; i += M128_REG_SZ) {
 				const __m128i a = _mm_loadu_si128 ( reinterpret_cast<__m128i*>(bfr+i));
 				const __m128i r1 = _mm_cmpeq_epi8 ( a, b );
 				const __m128i r2 = _mm_cmpeq_epi8 ( a, c );
@@ -1431,27 +1431,27 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 				const int reg2 = _mm_movemask_epi8( r2 );
 				if(reg1 || reg2) {	//If SIMD return a possible match in this block
 #ifdef _DEBUG_FIND_
-					char s[REG_SZ];
+					char s[M128_REG_SZ];
 					__m128i* k = (__m128i*)(s);
 					std::cout << "\nSSE2 Debug for i=" << i << std::hex << "\t Reg1 : 0x" << reg1 << "\t Reg2 : 0x" << reg2 << std::dec;
 					_mm_storeu_si128(k, a);
 					std::cout << "\nREG MMX A=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':s[z]);
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':s[z]);
 					_mm_storeu_si128(k, b);
 					std::cout << "\nREG MMX B=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << s[z];
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << s[z];
 					_mm_storeu_si128(k, r1);
 					std::cout << "\nREG MMX R=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
 					_mm_storeu_si128(k, c);
 					std::cout << "\nREG MMX C=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << s[z];
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << s[z];
 					_mm_storeu_si128(k, r2);
 					std::cout << "\nREG MMX R=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
 					std::cout << std::endl;
 #endif // _DEBUG_FIND_
-					for(int j = 0; j < REG_SZ; j++ ) {
+					for(int j = 0; j < M128_REG_SZ; j++ ) {
 						const int  ij   = i + j;
 						if(ij > bfr_size - search_size) break;
 						const char bfij = bfr[ij];
@@ -1474,7 +1474,7 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 			}
 		}
 		else { //Backward Search!
-			for (int i = bfr_size - std::max(search_size, REG_SZ); i > -REG_SZ; i -= REG_SZ) {
+			for (int i = bfr_size - std::max(search_size, M128_REG_SZ); i > -M128_REG_SZ; i -= M128_REG_SZ) {
 				if (i < 0) i = 0;
 				__m128i a = _mm_loadu_si128 ( reinterpret_cast<__m128i*>(bfr+i));
 				__m128i r1 = _mm_cmpeq_epi8 ( a, b );
@@ -1483,27 +1483,27 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 				int reg2=_mm_movemask_epi8( r2 );
 				if(reg1 || reg2) {	//If SIMD return a possible match in this block
 #ifdef _DEBUG_FIND_
-					char s[REG_SZ];
+					char s[M128_REG_SZ];
 					__m128i* k = (__m128i*)(s);
 					std::cout << "\nSSE2 Debug for i=" << i << std::hex << "\t Reg1 : 0x" << reg1 << "\t Reg2 : 0x" << reg2 << std::dec;
 					_mm_storeu_si128(k, a);
 					std::cout << "\nREG MMX A=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':s[z]);
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':s[z]);
 					_mm_storeu_si128(k, b);
 					std::cout << "\nREG MMX B=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << s[z];
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << s[z];
 					_mm_storeu_si128(k, r1);
 					std::cout << "\nREG MMX R=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
 					_mm_storeu_si128(k, c);
 					std::cout << "\nREG MMX C=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << s[z];
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << s[z];
 					_mm_storeu_si128(k, r2);
 					std::cout << "\nREG MMX R=";
-					for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
+					for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
 					std::cout << std::endl;
 #endif // _DEBUG_FIND_
-					for (int j = std::min(REG_SZ - 1, bfr_size - search_size - i); j >= 0; j--) {
+					for (int j = std::min(M128_REG_SZ - 1, bfr_size - search_size - i); j >= 0; j--) {
 						const int  ij   = i + j;
 						const char bfij = bfr[ij];
 
@@ -1572,7 +1572,7 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 		//681 clk with SSE2 vs 1200clk with C++
 		__m128i b = _mm_set1_epi8 ( search[0] );
 
-		for(int i = 0; i <= bfr_size - std::max(search_size, REG_SZ) ; i += REG_SZ ) {
+		for(int i = 0; i <= bfr_size - std::max(search_size, M128_REG_SZ) ; i += M128_REG_SZ ) {
 			__m128i a = _mm_loadu_si128 ( reinterpret_cast<__m128i*>(bfr+i));
 			__m128i r = _mm_cmpeq_epi8 ( a, b );
 			short reg=_mm_movemask_epi8( r );
@@ -1592,7 +1592,7 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 			std::cout << std::endl;
 		#endif // _DEBUG_FIND_
 			if( reg )
-				for(int j = 0; j < REG_SZ; j++ ) {
+				for(int j = 0; j < M128_REG_SZ; j++ ) {
 					const int  ij   = i + j;
 					if(ij > bfr_size - search_size) break;
 					const char bfij = bfr[ij];
@@ -1631,29 +1631,29 @@ inline int FindDialog::SearchAtBuffer( char *bfr, int bfr_size, char* search, in
 #ifdef __SSE2__
 		//676clk with SSE2, 1251 clk with C++
 		__m128i b = _mm_set1_epi8 ( search[0] );
-		for (int i = bfr_size - std::max(search_size, REG_SZ); i > -REG_SZ; i -= REG_SZ) {
+		for (int i = bfr_size - std::max(search_size, M128_REG_SZ); i > -M128_REG_SZ; i -= M128_REG_SZ) {
 			if (i < 0) i = 0;
 			__m128i a = _mm_loadu_si128 ( reinterpret_cast<__m128i*>(bfr+i));
 			__m128i r = _mm_cmpeq_epi8 ( a, b );
 			short reg=_mm_movemask_epi8( r );
 #ifdef _DEBUG_FIND_
 
-			char s[REG_SZ];
+			char s[M128_REG_SZ];
 			__m128i* k = (__m128i*)(s);
 			std::cout << " SSE2 Debug for i=" << i << std::hex << "\t Reg : 0x" << reg << std::dec;
 			_mm_storeu_si128(k, a);
 			std::cout << "\nREG MMX A=";
-			for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':s[z]);
+			for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':s[z]);
 			_mm_storeu_si128(k, b);
 			std::cout << "\nREG MMX B=";
-			for(int z=0; z< REG_SZ ; z++ ) std::cout << s[z];
+			for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << s[z];
 			_mm_storeu_si128(k, r);
 			std::cout << "\nREG MMX R=";
-			for(int z=0; z< REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
+			for(int z=0; z< M128_REG_SZ ; z++ ) std::cout << (s[z]==0?' ':'X');
 			std::cout << std::endl;
 #endif // _DEBUG_FIND_
 			if( reg ) {
-				for( int j = std::min(REG_SZ - 1, bfr_size - search_size - i); j >= 0; j--) {
+				for( int j = std::min(M128_REG_SZ - 1, bfr_size - search_size - i); j >= 0; j--) {
 					const int  ij   = i + j;
 					const char bfij = bfr[ij];
 					//if( (1<<j) & reg)
